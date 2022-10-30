@@ -7,18 +7,18 @@ import java.io.IOException;
 import org.apache.hadoop.io.Writable;
 
 public class RecommendedFriend implements Writable {
-	public Integer recommendedFriend;
-	public Integer mutualFriend;
+	public Integer recommended;
+	public Integer mutual;
 
     /**
     * RecommendedFriend Constructor
-    * @param Integer recommendedFriend the recommended friend
-    * @param Integer mutualFriend the mutual friend
+    * @param Integer recommended the recommended friend
+    * @param Integer mutual the mutual friend
     * Builds a RecommendedFriend object with the specified parameters
     */
-	public RecommendedFriend(Integer recommendedFriend, Integer mutualFriend) {
-		this.recommendedFriend = recommendedFriend;
-		this.mutualFriend = mutualFriend;
+	public RecommendedFriend(Integer recommended, Integer mutual) {
+		this.recommended = recommended;
+		this.mutual = mutual;
 	}
 
     /**
@@ -26,8 +26,8 @@ public class RecommendedFriend implements Writable {
     * Builds a RecommendedFriend object with the default parameters (-1, -1)
     */
 	public RecommendedFriend() {
-		this.recommendedFriend = new Integer(-1);
-		this.mutualFriend = new Integer(-1);
+		this.recommended = new Integer(-1);
+		this.mutual = new Integer(-1);
 	}
 
     /**
@@ -36,8 +36,8 @@ public class RecommendedFriend implements Writable {
     */
 	@Override
 	public void write(DataOutput output) throws IOException {
-		output.writeInt(recommendedFriend);
-		output.writeInt(mutualFriend);
+		output.writeInt(recommended);
+		output.writeInt(mutual);
 	}
 
     /**
@@ -46,7 +46,7 @@ public class RecommendedFriend implements Writable {
     */
 	@Override
 	public void readFields(DataInput input) throws IOException {
-		recommendedFriend = input.readInt();
-		mutualFriend = input.readInt();
+		recommended = input.readInt();
+		mutual = input.readInt();
 	}
 }

@@ -22,24 +22,28 @@ public class Reduce extends Reducer<IntWritable, RecommendedFriend, IntWritable,
             throws IOException, InterruptedException {
 
         // Key is the recommended friend, and value is the list of mutual friends
-        HashMap<Integer, List<Integer>> mutualFriends = new HashMap<Integer, List<Integer>>();
+        HashMap<Integer, List<Integer>> mutualFriendMap = new HashMap<Integer, List<Integer>>();
 
         for (RecommendedFriend value : recFriends) {
-            Integer user = value.recommendedFriend;
-            Integer mutualFriend = value.mutualFriend;
-            Boolean isAlreadyFriend;
-            isAlreadyFriend = value.mutualFriend == -1;
+            Integer user = value.recommended;
+            Integer mutual = value.mutual;
+            Boolean isFriend;
+            isFriend = value.mutual == -1;
 
             // Recommended user has already been added
-            if (mutualFriends.containsKey(user) && isAlreadyFriend)
-                 mutualFriends.put(user, null);
-            else if (mutualFriends.containsKey(user) && mutualFriends.get(user) != null)
-                 mutualFriends.get(user).add(mutualFriend);
-            else if (!isAlreadyFriend) {
+            if (mutualFriendMap.containsKey(user)) {
+                if (isFriend)
+                    mutualFriendMap.put(user, null);
+                else if (mutualFriendMap.get(user) != null)
+                    mutualFriendMap.get(user).add(mutual);
+            } else {
                 // Recommended user has not been added yet
-                ArrayList<Integer> mutualFriendsList = new ArrayList<Integer>();
-                mutualFriendsList.add(mutualFriend);
-                mutualFriends.put(user, mutualFriendsList);
+                if (!isFriend) {
+                	ArrayList<Integer> mutualFriendsList = new ArrayList<Integer>();
+                	mutualFriendsList.add(mutual);
+                    mutualFriendMap.put(user, mutualFriendsList);
+                } else
+                    mutualFriendMap.put(user, null);
             }
         }
 
@@ -47,14 +51,14 @@ public class Reduce extends Reducer<IntWritable, RecommendedFriend, IntWritable,
         SortedMap<Integer, List<Integer>> sortedMutualFriends = new TreeMap<Integer, List<Integer>>(new Comparator<Integer>() {
             @Override
             public int compare(Integer key1, Integer key2) {
-                Integer i1 = mutualFriends.get(key1).size();
-                Integer i2 = mutualFriends.get(key2).size();
+                Integer i1 = mutualFriendMap.get(key1).size();
+                Integer i2 = mutualFriendMap.get(key2).size();
                 return ((i1 > i2) || (i1.equals(i2) && key1 < key2)) ? -1 : 1;
             }
         });
 
         // Populate sortedMap
-        for (Entry<Integer, List<Integer>> entry : mutualFriends.entrySet()) {
+        for (Entry<Integer, List<Integer>> entry : mutualFriendMap.entrySet()) {
             if (entry.getValue() != null)
                 sortedMutualFriends.put(entry.getKey(), entry.getValue());
         }
