@@ -23,15 +23,15 @@ public class Reduce extends Reducer<IntWritable, RecommendedFriend, IntWritable,
     public void reduce(IntWritable key, Iterable<RecommendedFriend> recFriends, Context context)
             throws IOException, InterruptedException {
 
-        // Key is the recommended friend, and value is the list of mutual friends
+        // Key is the recommended friend, and value is mutual friends count
         HashMap<Integer, Integer> mutualFriendMap = new HashMap<Integer, Integer>();
         HashSet<Integer> friends = new HashSet<Integer>();
 
+        // For each recommendedFriend, populate mutualFriendMap and friends
         for (RecommendedFriend value : recFriends) {
             Integer user = value.recommended;
             Boolean isFriend = value.mutual == -1;
 
-            // we add the user to the set
             if(isFriend){
                 friends.add(user);
             }
@@ -39,7 +39,8 @@ public class Reduce extends Reducer<IntWritable, RecommendedFriend, IntWritable,
             mutualFriendMap.merge(user, 1, Integer::sum);
         }
 
-        // TreeMap with automatic sorting in descending order when adding new elements
+        // sortedMutualFriends is populated from mutualFriendMap in descending order of mutual friends count
+        // and by key (recommended friend ID) if the values (mutual friends count) are equal.
         SortedMap<Integer, Integer> sortedMutualFriends = new TreeMap<Integer, Integer>(new Comparator<Integer>() {
             @Override
             public int compare(Integer key1, Integer key2) {
